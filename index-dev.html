@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Decision Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+
+        .loading-content {
+            text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .medical-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading-text {
+            font-size: 24px;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            font-size: 16px;
+            color: #999;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 150px; /* Added bottom padding for footer */
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #4CAF50;
+            text-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .scenario-title {
+            font-size: 24px;
+            color: #FFC107;
+            margin-bottom: 5px;
+        }
+
+        .scenario-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        /* Case Presentation */
+        .case-section {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .case-section h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .patient-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .vital-signs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .vital-card {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .vital-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.2);
+            border-color: #4CAF50;
+        }
+
+        .vital-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFC107;
+            display: block;
+            margin: 5px 0;
+        }
+
+        .vital-label {
+            font-size: 14px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .critical {
+            color: #f44336 !important;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Decision Section */
+        .decision-section {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .decision-section h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-button {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid transparent;
+            color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .option-button:hover {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: #4CAF50;
+            transform: translateX(5px);
+        }
+
+        .option-button:hover::before {
+            left: 100%;
+        }
+
+        .option-button.selected {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #4CAF50;
+        }
+
+        .option-button.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4CAF50;
+        }
+
+        .option-button.incorrect {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: #f44336;
+        }
+
+        .option-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .feedback-section.show {
+            display: block;
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-icon {
+            font-size: 48px;
+        }
+
+        .feedback-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .feedback-correct {
+            color: #4CAF50;
+        }
+
+        .feedback-incorrect {
+            color: #f44336;
+        }
+
+        .feedback-content {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .explanation-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .clinical-pearl {
+            background: rgba(255, 193, 7, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #FFC107;
+        }
+
+        .clinical-pearl h4 {
+            color: #FFC107;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Continue Button */
+        .continue-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .continue-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        /* Timer */
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(40, 40, 60, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .timer-icon {
+            font-size: 24px;
+        }
+
+        /* Score Display */
+        .score-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(40, 40, 60, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        /* Results Screen */
+        .results-section {
+            background: rgba(40, 40, 60, 0.8);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.8s ease;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .results-title {
+            font-size: 36px;
+            color: #4CAF50;
+            margin-bottom: 30px;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #FFC107;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .action-button.secondary {
+            background: linear-gradient(135deg, #666, #555);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(40, 40, 60, 0.9);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            flex: 1;
+            margin-right: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: var(--progress, 0%);
+        }
+
+        .progress-text {
+            color: #e0e0e0;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            opacity: 0.6;
+            font-size: 14px;
+            margin-top: 50px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .scenario-title {
+                font-size: 20px;
+            }
+
+            .timer, .score-display {
+                position: static;
+                margin: 10px 0;
+                display: inline-flex;
+            }
+
+            .vital-signs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .results-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .option-button {
+                padding: 15px;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 20px 15px 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="medical-icon"><img src="images/logo.png" alt="Medical Icon" style="width: 48px; height: 48px;"></div>
+            <div class="loading-text">Clinical Decision Simulator</div>
+            <div class="loading-subtext">Preparing your scenario...</div>
+            <button onclick="forceStart()" style="margin-top: 30px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; display: none;" id="forceStartBtn">Click here if loading is stuck</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Clinical Decision Simulator</h1>
+            <div class="scenario-title" id="scenarioTitle">Emergency Department</div>
+            <div class="scenario-subtitle" id="scenarioSubtitle">Critical Care Decision Making</div>
+        </div>
+
+        <!-- Timer and Score -->
+        <div class="timer">
+            <span class="timer-icon">⏱️</span>
+            <span id="timerDisplay">00:00</span>
+        </div>
+
+        <div class="score-display">
+            <span>Score:</span>
+            <span id="scoreDisplay">0/0</span>
+        </div>
+
+        <!-- Case Presentation -->
+        <div class="case-section" id="caseSection">
+            <h2>Case Presentation</h2>
+            <div class="patient-info" id="patientInfo">
+                <!-- Patient info will be dynamically loaded -->
+            </div>
+            <div class="vital-signs" id="vitalSigns">
+                <!-- Vital signs will be dynamically loaded -->
+            </div>
+            <div class="case-details" id="caseDetails">
+                <!-- Additional case details will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Decision Section -->
+        <div class="decision-section" id="decisionSection">
+            <h2>Clinical Decision Point</h2>
+            <div class="question-text" id="questionText">
+                <!-- Question will be dynamically loaded -->
+            </div>
+            <div class="options-container" id="optionsContainer">
+                <!-- Options will be dynamically loaded -->
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div class="feedback-section" id="feedbackSection">
+            <div class="feedback-header">
+                <span class="feedback-icon" id="feedbackIcon"></span>
+                <h3 class="feedback-title" id="feedbackTitle"></h3>
+            </div>
+            <div class="feedback-content" id="feedbackContent">
+                <!-- Feedback will be dynamically loaded -->
+            </div>
+            <button class="continue-button" id="continueButton" onclick="nextQuestion()">Continue</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <h2 class="results-title">Scenario Complete!</h2>
+            <div class="results-stats">
+                <div class="stat-card">
+                    <span class="stat-value" id="finalScore">0%</span>
+                    <span class="stat-label">Final Score</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="correctAnswers">0/0</span>
+                    <span class="stat-label">Correct Answers</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="timeTaken">00:00</span>
+                    <span class="stat-label">Time Taken</span>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-button" onclick="restartScenario()">Try Again</button>
+                <a href="scenario-menu.html" class="action-button secondary">Choose Another Scenario</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <span class="progress-text" id="progressText">Question 1 of 5</span>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Clinical Decision Simulator © 2024 | Educational Use Only</p>
+        <div style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="images/BL-logo.png" alt="The Branch Lab Logo" style="width: 130px; height: 68px;">
+            <p style="font-size: 16px; color: #4CAF50; margin: 0;"></p>
+        </div>
+    </div>
+
+    <script>
+        // Scenarios data
+        const scenarios = {
+            'liver-failure': {
+                title: 'Acute Liver Failure',
+                subtitle: 'Airway Management Emergency',
+                patient: {
+                    name: 'Michael Chen',
+                    age: 58,
+                    gender: 'Male',
+                    mrn: '45789012',
+                    chiefComplaint: 'Altered mental status, respiratory distress'
+                },
+                vitals: {
+                    'Blood Pressure': { value: '88/52 mmHg', critical: true },
+                    'Heart Rate': { value: '112 bpm', critical: true },
+                    'Respiratory Rate': { value: '28/min', critical: true },
+                    'O2 Saturation': { value: '89%', critical: true },
+                    'Temperature': { value: '38.2°C', critical: false },
+                    'GCS': { value: '9 (E2V3M4)', critical: true }
+                },
+                caseDetails: `
+                    <h3>Clinical Presentation:</h3>
+                    <p>Mr. Chen is a 58-year-old male with known cirrhosis secondary to chronic hepatitis C and alcohol use disorder. He presents to the ED with acute decompensation.</p>
+
+                    <h4>History of Present Illness:</h4>
+                    <ul>
+                        <li>Found by family increasingly confused over past 48 hours</li>
+                        <li>Recent upper GI bleed 2 weeks ago requiring transfusion</li>
+                        <li>Non-compliant with lactulose and rifaximin</li>
+                        <li>Increasing abdominal distension</li>
+                    </ul>
+
+                    <h4>Physical Examination:</h4>
+                    <ul>
+                        <li><strong>General:</strong> Jaundiced, asterixis present, responding to pain only</li>
+                        <li><strong>Respiratory:</strong> Tachypneic, using accessory muscles, coarse breath sounds bilaterally</li>
+                        <li><strong>Cardiovascular:</strong> Tachycardic, hypotensive, weak peripheral pulses</li>
+                        <li><strong>Abdomen:</strong> Distended with shifting dullness, + fluid wave</li>
+                        <li><strong>Neurological:</strong> Confused, not following commands, hyperreflexic</li>
+                    </ul>
+
+                    <h4>Laboratory Results:</h4>
+                    <ul>
+                        <li>Ammonia: 186 μmol/L (elevated)</li>
+                        <li>INR: 2.8</li>
+                        <li>Platelets: 42,000/μL</li>
+                        <li>Creatinine: 2.1 mg/dL (baseline 1.0)</li>
+                        <li>pH: 7.28, pCO2: 48, HCO3: 18</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        text: "Given this patient's presentation with acute-on-chronic liver failure and respiratory distress, what is your immediate priority?",
+                        options: [
+                            "Immediately perform rapid sequence intubation (RSI)",
+                            "Optimize patient positioning and provide high-flow oxygen while preparing for intubation",
+                            "Start non-invasive positive pressure ventilation (BiPAP)",
+                            "Administer IV fluids and vasopressors first"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is to optimize positioning and provide high-flow oxygen while preparing for intubation.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>While this patient will likely require intubation, immediate RSI without optimization is dangerous in liver failure patients due to:</p>
+                            <ul>
+                                <li>Severe coagulopathy (INR 2.8, platelets 42k)</li>
+                                <li>Hemodynamic instability (BP 88/52)</li>
+                                <li>High aspiration risk from ascites</li>
+                                <li>Altered drug metabolism</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "In liver failure patients requiring intubation, always optimize pre-intubation conditions: correct coagulopathy if time permits, ensure adequate IV access, and have vasopressors ready for post-intubation hypotension."
+                    },
+                    {
+                        text: "You've decided to proceed with intubation. Which pre-treatment is MOST important for this patient?",
+                        options: [
+                            "Vitamin K 10mg IV to correct INR",
+                            "Fresh frozen plasma (FFP) and platelets",
+                            "Desmopressin (DDAVP) for platelet dysfunction",
+                            "Prophylactic antibiotics for SBP"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is fresh frozen plasma and platelets.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>This patient has severe coagulopathy that needs immediate correction before instrumentation of the airway:</p>
+                            <ul>
+                                <li>INR 2.8 requires FFP for rapid reversal</li>
+                                <li>Platelet count of 42,000 is below the threshold for safe intubation (usually >50,000)</li>
+                                <li>Vitamin K takes hours to work and won't help acute synthetic dysfunction</li>
+                                <li>While DDAVP may help, correcting the numbers is priority</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Target INR <1.5 and platelets >50,000 before elective procedures in liver disease. In emergencies, balance bleeding risk with urgency of intervention."
+                    },
+                    {
+                        text: "Which medication regimen would be MOST appropriate for RSI in this patient?",
+                        options: [
+                            "Etomidate 0.3 mg/kg + Succinylcholine 1.5 mg/kg",
+                            "Ketamine 1-2 mg/kg + Rocuronium 1.2 mg/kg",
+                            "Propofol 2 mg/kg + Succinylcholine 1.5 mg/kg",
+                            "Midazolam 0.3 mg/kg + Vecuronium 0.1 mg/kg"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is Ketamine + Rocuronium.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>This combination is optimal for this hemodynamically unstable liver failure patient:</p>
+                            <ul>
+                                <li><strong>Ketamine:</strong> Maintains hemodynamic stability, provides analgesia</li>
+                                <li><strong>Rocuronium:</strong> Safe in liver/kidney dysfunction, reversible with sugammadex</li>
+                                <li><strong>Avoid Propofol:</strong> Will worsen hypotension</li>
+                                <li><strong>Avoid Succinylcholine:</strong> Risk of hyperkalemia in liver failure</li>
+                                <li><strong>Etomidate:</strong> Controversial due to adrenal suppression in critical illness</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "In liver failure, drug metabolism is unpredictable. Use medications with organ-independent elimination when possible, and consider reduced doses with careful titration."
+                    },
+                    {
+                        text: "Post-intubation, the patient's blood pressure drops to 72/40. What is your FIRST intervention?",
+                        options: [
+                            "Bolus 30 mL/kg crystalloid rapidly",
+                            "Start norepinephrine infusion",
+                            "Give 5% albumin 250 mL",
+                            "Trendelenburg position and reassess"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is to start norepinephrine infusion.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>In cirrhotic patients with post-intubation hypotension:</p>
+                            <ul>
+                                <li>Positive pressure ventilation reduces venous return</li>
+                                <li>Large volume crystalloid worsens ascites and edema</li>
+                                <li>Norepinephrine is the vasopressor of choice in liver disease</li>
+                                <li>Small albumin boluses can be given concurrently but aren't first-line</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Post-intubation hypotension occurs in up to 40% of critically ill patients. Have push-dose pressors or infusion ready before intubation in hemodynamically tenuous patients."
+                    },
+                    {
+                        text: "What ventilator settings would be MOST appropriate for this patient?",
+                        options: [
+                            "Volume control: TV 8 mL/kg IBW, PEEP 5, FiO2 100%",
+                            "Volume control: TV 6 mL/kg IBW, PEEP 8-10, FiO2 60%",
+                            "Pressure control: PIP 30, PEEP 12, FiO2 100%",
+                            "APRV with Phigh 25, Plow 0"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is Volume control with TV 6 mL/kg IBW, PEEP 8-10, FiO2 60%.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Lung-protective ventilation is crucial in liver failure patients:</p>
+                            <ul>
+                                <li>Low tidal volumes (6 mL/kg IBW) prevent ventilator-induced lung injury</li>
+                                <li>Moderate PEEP (8-10) improves oxygenation without compromising hemodynamics</li>
+                                <li>Avoid excessive FiO2 - target SpO2 88-95%</li>
+                                <li>Higher PEEP may worsen hepatic congestion</li>
+                                <li>Monitor plateau pressures closely (<30 cmH2O)</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Patients with cirrhosis often have hepatopulmonary syndrome or portopulmonary hypertension. Use lung-protective strategies and monitor for right heart strain."
+                    }
+                ]
+            },
+            'cardiac-arrest': {
+                title: 'Cardiac Arrest',
+                subtitle: 'ACLS Protocol Management',
+                patient: {
+                    name: 'Jennifer Williams',
+                    age: 62,
+                    gender: 'Female',
+                    mrn: '78901234',
+                    chiefComplaint: 'Found unresponsive in hospital room'
+                },
+                vitals: {
+                    'Blood Pressure': { value: 'Not obtainable', critical: true },
+                    'Heart Rate': { value: 'Pulseless', critical: true },
+                    'Respiratory Rate': { value: '0/min', critical: true },
+                    'O2 Saturation': { value: 'Not detectable', critical: true },
+                    'Temperature': { value: '36.8°C', critical: false },
+                    'Rhythm': { value: 'Ventricular Fibrillation', critical: true }
+                },
+                caseDetails: `
+                    <h3>Clinical Presentation:</h3>
+                    <p>Mrs. Williams is a 62-year-old female admitted 2 days ago with NSTEMI. She was found unresponsive by nursing staff during morning rounds.</p>
+
+                    <h4>Past Medical History:</h4>
+                    <ul>
+                        <li>Coronary artery disease with recent NSTEMI</li>
+                        <li>Type 2 diabetes mellitus</li>
+                        <li>Hypertension</li>
+                        <li>Hyperlipidemia</li>
+                    </ul>
+
+                    <h4>Current Situation:</h4>
+                    <ul>
+                        <li>Code blue called at 08:32</li>
+                        <li>CPR initiated by nursing staff</li>
+                        <li>Initial rhythm check shows ventricular fibrillation</li>
+                        <li>IV access present (peripheral 18G)</li>
+                        <li>Code team has just arrived</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        text: "The patient is in ventricular fibrillation. After confirming the rhythm, what is your IMMEDIATE next action?",
+                        options: [
+                            "Continue CPR for 2 minutes then defibrillate",
+                            "Immediately defibrillate at 200J (biphasic)",
+                            "Give epinephrine 1mg IV push",
+                            "Intubate the patient first"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is to immediately defibrillate at 200J.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>For witnessed VF/pVT arrest:</p>
+                            <ul>
+                                <li>Immediate defibrillation is the priority</li>
+                                <li>Every minute delay reduces survival by 7-10%</li>
+                                <li>Use maximum energy (200J for biphasic)</li>
+                                <li>Resume CPR immediately after shock</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "In VF/VT arrest, early defibrillation is the single most important intervention. Minimize interruptions in chest compressions - charge the defibrillator during CPR."
+                    },
+                    {
+                        text: "After defibrillation and 2 minutes of CPR, rhythm check shows persistent VF. What medication should be given FIRST?",
+                        options: [
+                            "Epinephrine 1mg IV",
+                            "Amiodarone 300mg IV",
+                            "Lidocaine 1.5mg/kg IV",
+                            "Magnesium 2g IV"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is Epinephrine 1mg IV.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>ACLS medication sequence for VF/pVT:</p>
+                            <ul>
+                                <li>Epinephrine 1mg IV/IO every 3-5 minutes</li>
+                                <li>Given after 2nd shock in persistent VF/VT</li>
+                                <li>Antiarrhythmics come after epinephrine</li>
+                                <li>Vasopressin no longer recommended in ACLS</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Remember the sequence: Shock → CPR 2 min → Shock → CPR 2 min + Epinephrine → Shock → CPR 2 min + Antiarrhythmic"
+                    },
+                    {
+                        text: "High-quality CPR is ongoing. Which parameter is MOST important to monitor for CPR quality?",
+                        options: [
+                            "End-tidal CO2 (EtCO2) levels",
+                            "Arterial blood pressure",
+                            "Pulse oximetry readings",
+                            "Pupillary response"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is End-tidal CO2 levels.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>EtCO2 is the best real-time indicator of CPR quality:</p>
+                            <ul>
+                                <li>Target EtCO2 >20 mmHg during CPR</li>
+                                <li>Sudden rise suggests ROSC</li>
+                                <li>Low values (<10) indicate poor perfusion</li>
+                                <li>Better than pulse checks for monitoring</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "An abrupt increase in EtCO2 (typically >40 mmHg) is often the first sign of ROSC, even before a pulse is palpable."
+                    },
+                    {
+                        text: "After the third shock and appropriate medications, the rhythm converts to PEA with narrow complexes at 40 bpm. What is the MOST important next step?",
+                        options: [
+                            "Check for pulse and continue CPR if absent",
+                            "Give atropine 1mg IV for bradycardia",
+                            "Start transcutaneous pacing",
+                            "Administer calcium chloride 1g IV"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is to check for pulse and continue CPR if absent.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>PEA management priorities:</p>
+                            <ul>
+                                <li>Confirm pulselessness - continue CPR if no pulse</li>
+                                <li>Search for reversible causes (H's and T's)</li>
+                                <li>Atropine no longer recommended in PEA/asystole</li>
+                                <li>Pacing not effective in PEA</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "In PEA, think H's and T's: Hypovolemia, Hypoxia, Hydrogen ion (acidosis), Hypo/hyperkalemia, Hypothermia, Tension pneumothorax, Tamponade, Toxins, Thrombosis (PE/MI)."
+                    },
+                    {
+                        text: "The patient achieves ROSC after 18 minutes of resuscitation. BP is 82/48, HR 110, SpO2 88%. What is your immediate post-cardiac arrest priority?",
+                        options: [
+                            "Immediate cardiac catheterization",
+                            "Targeted temperature management initiation",
+                            "Optimize oxygenation and blood pressure",
+                            "Obtain head CT to rule out stroke"
+                        ],
+                        correct: 2,
+                        explanation: `The correct answer is to optimize oxygenation and blood pressure.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Post-ROSC immediate priorities:</p>
+                            <ul>
+                                <li>Avoid hypoxia AND hyperoxia (target SpO2 94-98%)</li>
+                                <li>Maintain MAP >65 mmHg to ensure cerebral perfusion</li>
+                                <li>Treat the cause, but stabilize first</li>
+                                <li>TTM and cath are important but come after stabilization</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Post-cardiac arrest care bundle: Optimize ventilation/oxygenation, treat hypotension, 12-lead ECG, consider PCI if STEMI, and initiate targeted temperature management if patient remains comatose."
+                    }
+                ]
+            },
+            'stroke-protocol': {
+                title: 'Acute Stroke',
+                subtitle: 'Time-Critical Decision Making',
+                patient: {
+                    name: 'Robert Johnson',
+                    age: 72,
+                    gender: 'Male',
+                    mrn: '56789123',
+                    chiefComplaint: 'Sudden onset right-sided weakness and speech difficulty'
+                },
+                vitals: {
+                    'Blood Pressure': { value: '186/98 mmHg', critical: true },
+                    'Heart Rate': { value: '88 bpm irregular', critical: false },
+                    'Respiratory Rate': { value: '18/min', critical: false },
+                    'O2 Saturation': { value: '95% RA', critical: false },
+                    'Temperature': { value: '37.1°C', critical: false },
+                    'Blood Glucose': { value: '142 mg/dL', critical: false }
+                },
+                caseDetails: `
+                    <h3>Timeline:</h3>
+                    <p><strong>Current time:</strong> 11:45 AM<br>
+                    <strong>Symptom onset:</strong> 9:30 AM (witnessed by wife)<br>
+                    <strong>Time since onset:</strong> 2 hours 15 minutes</p>
+
+                    <h4>History of Present Illness:</h4>
+                    <ul>
+                        <li>Was eating breakfast when suddenly dropped his fork</li>
+                        <li>Wife noticed right facial droop and slurred speech</li>
+                        <li>Unable to lift right arm or leg</li>
+                        <li>No loss of consciousness</li>
+                        <li>No seizure activity</li>
+                    </ul>
+
+                    <h4>Past Medical History:</h4>
+                    <ul>
+                        <li>Atrial fibrillation (not on anticoagulation)</li>
+                        <li>Hypertension</li>
+                        <li>Type 2 diabetes mellitus</li>
+                        <li>Former smoker (quit 5 years ago)</li>
+                    </ul>
+
+                    <h4>NIHSS Score: 14</h4>
+                    <ul>
+                        <li>LOC: Alert (0)</li>
+                        <li>LOC Questions: Answers both correctly (0)</li>
+                        <li>LOC Commands: Performs both correctly (0)</li>
+                        <li>Best Gaze: Normal (0)</li>
+                        <li>Visual Fields: Normal (0)</li>
+                        <li>Facial Palsy: Complete right facial paralysis (3)</li>
+                        <li>Motor Arm: Right arm drifts to bed (3)</li>
+                        <li>Motor Leg: Right leg drifts to bed (3)</li>
+                        <li>Limb Ataxia: Cannot assess due to weakness (0)</li>
+                        <li>Sensory: Severe sensory loss right side (2)</li>
+                        <li>Best Language: Mild aphasia (1)</li>
+                        <li>Dysarthria: Severe dysarthria (2)</li>
+                        <li>Extinction/Inattention: No abnormality (0)</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        text: "Based on the presentation and timeline, what is your IMMEDIATE next step?",
+                        options: [
+                            "Order stat head CT without contrast",
+                            "Start IV tPA immediately given clear stroke symptoms",
+                            "Order MRI brain with diffusion sequences",
+                            "Check PT/INR and wait for results"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is to order stat head CT without contrast.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Non-contrast head CT is the first imaging study:</p>
+                            <ul>
+                                <li>Rules out hemorrhagic stroke</li>
+                                <li>Must be done before any thrombolysis</li>
+                                <li>Can be completed quickly (door-to-CT <25 min)</li>
+                                <li>MRI takes too long in acute setting</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Time is brain! Every minute without treatment, 1.9 million neurons die. The stroke protocol should be activated immediately upon arrival."
+                    },
+                    {
+                        text: "Head CT shows no hemorrhage or early ischemic changes. The patient is within the tPA window. What is the MOST important contraindication to check before giving tPA?",
+                        options: [
+                            "Blood pressure >185/110 mmHg",
+                            "Age >70 years",
+                            "NIHSS score >10",
+                            "Atrial fibrillation"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is blood pressure >185/110 mmHg.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>BP must be <185/110 before tPA:</p>
+                            <ul>
+                                <li>Current BP 186/98 exceeds threshold</li>
+                                <li>Can treat with labetalol or nicardipine</li>
+                                <li>Age >70 is not a contraindication</li>
+                                <li>High NIHSS actually favors treatment</li>
+                                <li>AFib is not a contraindication</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Major tPA contraindications: hemorrhage on CT, recent stroke/head trauma, bleeding diathesis, BP >185/110 despite treatment."
+                    },
+                    {
+                        text: "You've controlled the blood pressure to 172/88. Labs show platelets 165k, INR 1.1, glucose 142. What is the appropriate tPA dose?",
+                        options: [
+                            "0.9 mg/kg (10% bolus, 90% over 1 hour)",
+                            "0.6 mg/kg (all as infusion over 1 hour)",
+                            "100 mg fixed dose IV push",
+                            "1.1 mg/kg (all as bolus)"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is 0.9 mg/kg with 10% bolus, 90% over 1 hour.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Standard tPA dosing protocol:</p>
+                            <ul>
+                                <li>Total dose: 0.9 mg/kg (max 90 mg)</li>
+                                <li>Give 10% as IV bolus over 1 minute</li>
+                                <li>Remaining 90% as infusion over 60 minutes</li>
+                                <li>Do not exceed 90 mg total dose</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Calculate tPA dose carefully. For a 100 kg patient: 90 mg total (9 mg bolus, 81 mg infusion). Double-check with pharmacy."
+                    },
+                    {
+                        text: "Twenty minutes into the tPA infusion, the patient develops a severe headache and becomes less responsive. What is your immediate action?",
+                        options: [
+                            "Stop tPA infusion and order stat head CT",
+                            "Give mannitol 1 g/kg for increased ICP",
+                            "Continue tPA but slow the infusion rate",
+                            "Administer fentanyl for headache control"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is to stop tPA and order stat head CT.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Symptomatic intracerebral hemorrhage protocol:</p>
+                            <ul>
+                                <li>Stop tPA immediately</li>
+                                <li>Urgent head CT to confirm hemorrhage</li>
+                                <li>Prepare reversal agents (cryoprecipitate, platelets)</li>
+                                <li>Neurosurgery consultation</li>
+                                <li>Never continue tPA with neurological deterioration</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Symptomatic ICH occurs in ~6% of tPA patients. Have reversal protocol ready: 10 units cryoprecipitate, consider platelets and aminocaproic acid."
+                    },
+                    {
+                        text: "CT shows no hemorrhage. CTA reveals M1 segment MCA occlusion. The patient remains symptomatic with NIHSS 14. Time is now 3 hours from onset. What is the next best step?",
+                        options: [
+                            "Continue medical management only",
+                            "Arrange urgent mechanical thrombectomy",
+                            "Start antiplatelet therapy with aspirin 325mg",
+                            "Begin therapeutic heparin infusion"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is to arrange urgent mechanical thrombectomy.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Thrombectomy indications met:</p>
+                            <ul>
+                                <li>Large vessel occlusion (M1 MCA)</li>
+                                <li>Within 6-hour window (can extend to 24h with imaging)</li>
+                                <li>NIHSS ≥6</li>
+                                <li>No hemorrhage on imaging</li>
+                                <li>Benefits seen even after tPA</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Number Needed to Treat (NNT) for thrombectomy = 2.6 for functional independence. Time to reperfusion is critical - every 30-minute delay reduces good outcome by 10%."
+                    }
+                ]
+            },
+            'sepsis-bundle': {
+                title: 'Sepsis Recognition',
+                subtitle: 'Bundle Implementation',
+                patient: {
+                    name: 'Maria Rodriguez',
+                    age: 68,
+                    gender: 'Female',
+                    mrn: '34567890',
+                    chiefComplaint: 'Fever, confusion, and weakness'
+                },
+                vitals: {
+                    'Blood Pressure': { value: '82/48 mmHg', critical: true },
+                    'Heart Rate': { value: '118 bpm', critical: true },
+                    'Respiratory Rate': { value: '26/min', critical: true },
+                    'O2 Saturation': { value: '91% on 2L', critical: true },
+                    'Temperature': { value: '39.2°C', critical: true },
+                    'Mental Status': { value: 'Confused', critical: true }
+                },
+                caseDetails: `
+                    <h3>Clinical Presentation:</h3>
+                    <p>Mrs. Rodriguez is a 68-year-old female brought in by family for acute confusion and weakness over the past 24 hours.</p>
+
+                    <h4>History of Present Illness:</h4>
+                    <ul>
+                        <li>Dysuria and urinary frequency for 3 days</li>
+                        <li>Fever and chills started yesterday</li>
+                        <li>Became confused this morning, not recognizing family</li>
+                        <li>Decreased oral intake, minimal urine output today</li>
+                    </ul>
+
+                    <h4>Past Medical History:</h4>
+                    <ul>
+                        <li>Type 2 diabetes mellitus</li>
+                        <li>Recurrent UTIs</li>
+                        <li>Chronic kidney disease (baseline Cr 1.4)</li>
+                        <li>Hypertension</li>
+                    </ul>
+
+                    <h4>Initial Laboratory Results:</h4>
+                    <ul>
+                        <li>WBC: 18,500 with 15% bands</li>
+                        <li>Lactate: 4.2 mmol/L</li>
+                        <li>Creatinine: 2.8 mg/dL</li>
+                        <li>Procalcitonin: 8.5 ng/mL</li>
+                        <li>Urinalysis: >100 WBC, many bacteria, positive nitrites</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        text: "Based on this presentation, what is your diagnosis and immediate priority?",
+                        options: [
+                            "Septic shock - initiate 1-hour sepsis bundle",
+                            "Severe sepsis - start antibiotics within 6 hours",
+                            "UTI with dehydration - IV fluids and oral antibiotics",
+                            "SIRS - observe and trend vital signs"
+                        ],
+                        correct: 0,
+                        explanation: `The correct answer is septic shock - initiate 1-hour bundle.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>This patient meets septic shock criteria:</p>
+                            <ul>
+                                <li>Suspected infection (UTI)</li>
+                                <li>Organ dysfunction (confusion, elevated Cr)</li>
+                                <li>Hypotension (MAP 59) despite likely hypovolemia</li>
+                                <li>Lactate >2 mmol/L</li>
+                                <li>Requires immediate bundle implementation</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Septic shock = sepsis + hypotension requiring vasopressors OR lactate >2 mmol/L. Time zero starts at triage or first documentation of criteria."
+                    },
+                    {
+                        text: "What volume of IV fluids should be administered in the first hour?",
+                        options: [
+                            "500 mL normal saline",
+                            "30 mL/kg crystalloid",
+                            "1 liter lactated ringers",
+                            "100 mL/hr continuous infusion"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is 30 mL/kg crystalloid.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Surviving Sepsis Campaign guidelines:</p>
+                            <ul>
+                                <li>30 mL/kg crystalloid for initial resuscitation</li>
+                                <li>Should be completed within 3 hours</li>
+                                <li>For 70 kg patient = 2100 mL</li>
+                                <li>Use balanced crystalloids when possible</li>
+                                <li>Don't delay for central access</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Start fluids immediately through peripheral IV. You can always slow down, but you can't make up for lost time. Use pressure bags if needed."
+                    },
+                    {
+                        text: "After drawing blood cultures, which antibiotic regimen is MOST appropriate?",
+                        options: [
+                            "Ceftriaxone 1g IV daily",
+                            "Vancomycin + Cefepime",
+                            "Ciprofloxacin 400mg IV q12h",
+                            "Piperacillin-tazobactam + Vancomycin"
+                        ],
+                        correct: 3,
+                        explanation: `The correct answer is Piperacillin-tazobactam + Vancomycin.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Broad-spectrum coverage for septic shock:</p>
+                            <ul>
+                                <li>Cover gram-positives (including MRSA): Vancomycin</li>
+                                <li>Cover gram-negatives and Pseudomonas: Pip-tazo</li>
+                                <li>De-escalate based on cultures</li>
+                                <li>Single agents inadequate for septic shock</li>
+                                <li>Consider local antibiogram</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "In septic shock, go broad and go early. Every hour delay in appropriate antibiotics increases mortality by 7.6%."
+                    },
+                    {
+                        text: "After 30 mL/kg fluids, BP is 88/52, lactate 3.8. What is the next step?",
+                        options: [
+                            "Give another 30 mL/kg bolus",
+                            "Start norepinephrine to target MAP ≥65",
+                            "Add hydrocortisone 100mg IV",
+                            "Transfuse 2 units PRBCs"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is start norepinephrine to target MAP ≥65.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>Vasopressor indications in sepsis:</p>
+                            <ul>
+                                <li>Persistent hypotension after initial fluid resuscitation</li>
+                                <li>Norepinephrine is first-line vasopressor</li>
+                                <li>Target MAP ≥65 mmHg</li>
+                                <li>Can start through peripheral IV briefly</li>
+                                <li>Steroids only if refractory shock</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Don't fluid overload septic patients. If not fluid responsive after initial bolus, start vasopressors. Central access preferred but don't delay norepinephrine."
+                    },
+                    {
+                        text: "Which additional component must be completed within the first hour?",
+                        options: [
+                            "Central venous catheter placement",
+                            "Repeat lactate if initial >2 mmol/L",
+                            "Echocardiogram for cardiac function",
+                            "Arterial line placement"
+                        ],
+                        correct: 1,
+                        explanation: `The correct answer is repeat lactate if initial >2 mmol/L.
+
+                        <div class="explanation-box">
+                            <h4>Rationale:</h4>
+                            <p>1-hour sepsis bundle components:</p>
+                            <ul>
+                                <li>Measure lactate (repeat if >2)</li>
+                                <li>Obtain blood cultures before antibiotics</li>
+                                <li>Administer broad-spectrum antibiotics</li>
+                                <li>Begin rapid fluid resuscitation for hypotension/lactate ≥4</li>
+                                <li>Start vasopressors if hypotensive during/after fluids</li>
+                            </ul>
+                        </div>`,
+                        clinicalPearl: "Lactate clearance (>10% decrease) is associated with improved survival. Serial lactates guide resuscitation effectiveness."
+                    }
+                ]
+            },
+            'trauma-airway': {
+                title: 'Trauma Airway',
+                subtitle: 'Complex Airway Management',
+                patient: {
+                    name: 'David Thompson',
+                    age: 28,
+                    gender: 'Male',
+                    mrn: '23456789',
+                    chiefComplaint: 'Motor vehicle collision with facial trauma'
+                },
+                vitals: {
+                    'Blood Pressure': { value: '108/72 mmHg', critical: false },
+                    'Heart Rate': { value: '112 bpm', critical: true },
+                    'Respiratory Rate': { value: '28/min', critical: true },
+                    'O2 Saturation': { value: '88% on NRB', critical: true },
+                    'Temperature': { value: '36.4°C', critical: false },
+                    'GCS': { value: '12 (E3V3M6)', critical: true }
+                },
+                caseDetails: `
+                    <h3>Mechanism of Injury:</h3>
+                    <p>Unrestrained driver in high-speed MVC, prolonged extrication (45 minutes). Significant intrusion driver's side.</p>
+
+                    <h4>Primary Survey Findings:</h4>
+                    <ul>
+                        <li><strong>Airway:</strong> Blood in oropharynx, gurgling respirations</li>
+                        <li><strong>Breathing:</strong> Tachypneic, decreased breath sounds left base</li>
+                        <li><strong>Circulation:</strong> Tachycardic, weak radial pulses</li>
+                        <li><strong>Disability:</strong> GCS 12, moving all extremities</li>
+                        <li><strong>Exposure:</strong> Multiple abrasions and contusions</li>
+                    </ul>
+
+                    <h4>Obvious Injuries:</h4>
+                    <ul>
+                        <li>Severe midface trauma with unstable maxilla</li>
+                        <li>Mandibular fracture with malocclusion</li>
+                        <li>Active oronasal bleeding</li>
+                        <li>Left chest wall tenderness with crepitus</li>
+                        <li>C-collar in place, not yet cleared</li>
+                    </ul>
+
+                    <h4>Initial Interventions:</h4>
+                    <ul>
+                        <li>100% O2 via non-rebreather</li>
+                        <li>Two large-bore IVs established</li>
+                        <li>Trauma team activation</li>
+                    </ul>

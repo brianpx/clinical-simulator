@@ -249,13 +249,54 @@
             opacity: 0.6;
             font-size: 14px;
         }
+
+        .use-enhanced-button {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .use-enhanced-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .enhanced-notice {
+            background: rgba(33, 150, 243, 0.1);
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .enhanced-notice h3 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏥 Clinical Decision Simulator</h1>
+            <h1><img src="images/logo.png" alt="Clinical Simulator Logo" style="width: 48px; height: 48px; vertical-align: middle; margin-right: 10px;"> Clinical Decision Simulator</h1>
             <p>Master critical medical decisions through interactive scenarios</p>
+        </div>
+
+        <!-- Enhanced Version Notice -->
+        <div class="enhanced-notice">
+            <h3>✨ Try the Enhanced All-in-One Version!</h3>
+            <p>Experience all scenarios in a single, beautifully integrated interface with improved features.</p>
+            <a href="clinical-simulator-enhanced.html" class="use-enhanced-button">
+                Launch Enhanced Simulator
+            </a>
         </div>
 
         <div class="stats-section">
@@ -286,6 +327,10 @@
 
         <div class="footer">
             <p>Clinical Decision Simulator © 2024 | Educational Use Only</p>
+            <div style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="images/BL-logo.png" alt="The Branch Lab Logo" style="width: 130px; height: 68px;">
+                <p style="font-size: 16px; color: #4CAF50; margin: 0;"></p>
+            </div>
         </div>
     </div>
 
