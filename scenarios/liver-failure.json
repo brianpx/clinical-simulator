@@ -1,0 +1,307 @@
+{
+    "metadata": {
+        "title": "Acute Liver Failure - Airway Emergency",
+        "description": "Manage a critically ill patient with acute-on-chronic liver failure requiring emergent intubation",
+        "specialty": "Critical Care/Emergency Medicine",
+        "difficulty": "advanced",
+        "duration": "15-20 min",
+        "author": "Critical Care Team",
+        "version": "2.0",
+        "learning_objectives": [
+            "Recognize high-risk features for peri-intubation cardiac arrest",
+            "Optimize pre-intubation physiology in liver failure",
+            "Select appropriate induction agents for hemodynamically unstable patients",
+            "Apply the RAPID approach to cardiovascular assessment"
+        ]
+    },
+    "initial_state": {
+        "patient": {
+            "demographics": "52-year-old female",
+            "weight": "80 kg",
+            "height": "165 cm",
+            "diagnosis": "Acute-on-chronic liver failure with sepsis",
+            "pmh": "Alcoholic cirrhosis, portal hypertension, Grade 2 varices",
+            "allergies": "None known",
+            "medications": "Lactulose, rifaximin, propranolol"
+        },
+        "vitals": {
+            "bp": {
+                "value": "75/40 mmHg",
+                "critical": true
+            },
+            "hr": {
+                "value": "115 bpm",
+                "critical": true
+            },
+            "spo2": {
+                "value": "85%",
+                "critical": true
+            },
+            "temp": {
+                "value": "38.5°C",
+                "critical": false
+            },
+            "rr": {
+                "value": "28",
+                "critical": true
+            },
+            "ph": {
+                "value": "7.18",
+                "critical": true
+            },
+            "inr": {
+                "value": "2.6",
+                "critical": true
+            }
+        },
+        "labs": {
+            "wbc": "18.5",
+            "hgb": "8.2",
+            "plt": "45",
+            "na": "128",
+            "k": "5.2",
+            "cr": "2.8",
+            "bili": "12.5",
+            "lactate": "4.2"
+        }
+    },
+    "nodes": {
+        "start": {
+            "type": "scenario",
+            "title": "Initial Assessment",
+            "content": "Patient presenting with:\n• Obtunded mental status (GCS 8)\n• Severe hemodynamic instability (SBP 75 mmHg)\n• Significant hypoxemia (SpO₂ 85% on NRB)\n• Severe metabolic acidosis (pH 7.18)\n• Large volume ascites\n• Coagulopathy (INR 2.6)\n\nUrgent airway evaluation required due to deteriorating respiratory status and inability to protect airway.",
+            "decisions": [
+                {
+                    "id": "immediate",
+                    "text": "Proceed with immediate intubation",
+                    "next": "immediate_intubation"
+                },
+                {
+                    "id": "assess",
+                    "text": "Assess risks and optimize physiology first",
+                    "next": "assess_risks"
+                },
+                {
+                    "id": "noninvasive",
+                    "text": "Trial of noninvasive ventilation",
+                    "next": "niv_trial"
+                }
+            ]
+        },
+        "immediate_intubation": {
+            "type": "outcome",
+            "result": "incorrect",
+            "feedback": "Proceeding without optimization in this high-risk patient significantly increases the risk of peri-intubation cardiac arrest. Multiple modifiable risk factors are present that should be addressed first.",
+            "reference": "Section 3.3: Risk Factors",
+            "points": 0,
+            "next": "start"
+        },
+        "niv_trial": {
+            "type": "outcome",
+            "result": "incorrect",
+            "feedback": "NIV is contraindicated with obtunded mental status (GCS 8) due to aspiration risk. This patient cannot protect their airway and requires definitive airway management after optimization.",
+            "reference": "Section 2.1: NIV Contraindications",
+            "points": 0,
+            "next": "start"
+        },
+        "assess_risks": {
+            "type": "scenario",
+            "title": "Pre-oxygenation Strategy",
+            "content": "Risk assessment reveals:\n• Shock index 1.5 (HR 115/SBP 75)\n• Severe hypoxemia despite NRB mask\n• Metabolic acidosis\n• Coagulopathy\n\nAll are high-risk features for peri-intubation arrest.\n\nNext step: Optimize pre-oxygenation to prevent critical desaturation during intubation.",
+            "result": "correct",
+            "feedback": "Excellent decision! Recognizing and addressing modifiable risk factors before intubation significantly reduces complications in high-risk patients.",
+            "reference": "Section 3.3: Risk Factors",
+            "points": 10,
+            "decisions": [
+                {
+                    "id": "standard",
+                    "text": "Use standard face mask with 100% O₂",
+                    "next": "standard_mask"
+                },
+                {
+                    "id": "hfnc",
+                    "text": "Use high-flow nasal cannula with head of bed elevation",
+                    "next": "hfnc_preoxygenation"
+                },
+                {
+                    "id": "bvm",
+                    "text": "Bag-valve-mask ventilation",
+                    "next": "bvm_ventilation"
+                }
+            ]
+        },
+        "standard_mask": {
+            "type": "outcome",
+            "result": "incorrect",
+            "feedback": "Standard face masks fail to create a tight seal and are limited by V/Q mismatch and shunt physiology in liver failure patients. HFNC provides superior pre-oxygenation through higher FiO₂ delivery and PEEP effect.",
+            "reference": "Section 4.2: Hypoxemia Management",
+            "points": 0,
+            "next": "assess_risks"
+        },
+        "bvm_ventilation": {
+            "type": "outcome",
+            "result": "partial",
+            "feedback": "While BVM can deliver high FiO₂, it risks gastric insufflation in a patient with ascites and requires perfect technique. HFNC is preferred for pre-oxygenation as it's better tolerated and provides consistent oxygen delivery.",
+            "reference": "Section 4.2: Hypoxemia Management",
+            "points": 5,
+            "next": "assess_risks"
+        },
+        "hfnc_preoxygenation": {
+            "type": "scenario",
+            "title": "Hemodynamic Optimization",
+            "content": "Pre-oxygenation initiated with HFNC at 60L/min, FiO₂ 100%, HOB elevated to 30 degrees.\nSpO₂ improving to 91%.\n\nCurrent BP remains 75/40 mmHg. Need to address hemodynamics before intubation.\n\nPatient has received 2L crystalloid already with minimal response.",
+            "result": "correct",
+            "feedback": "HFNC with flows of 40-60L/min helps create an oxygen reservoir and provides 3-5 cmH₂O of PEEP. HOB elevation improves diaphragmatic excursion in patients with ascites.",
+            "reference": "Section 4.2: Hypoxemia Management",
+            "points": 10,
+            "vitals_update": {
+                "spo2": {
+                    "value": "91%",
+                    "critical": true
+                }
+            },
+            "decisions": [
+                {
+                    "id": "fluid",
+                    "text": "Give additional 500 mL fluid bolus",
+                    "next": "fluid_bolus"
+                },
+                {
+                    "id": "phenylephrine",
+                    "text": "Administer push-dose phenylephrine",
+                    "next": "phenylephrine"
+                },
+                {
+                    "id": "norepinephrine",
+                    "text": "Start norepinephrine infusion",
+                    "next": "norepi_infusion"
+                }
+            ]
+        },
+        "fluid_bolus": {
+            "type": "outcome",
+            "result": "incorrect",
+            "feedback": "This patient has non-volume responsive shock with large volume ascites. Additional fluid risks worsening pulmonary edema and hepatic congestion without improving hemodynamics. Vasopressor support is indicated.",
+            "reference": "Section 4.3: RAPID Approach",
+            "points": 0,
+            "next": "hfnc_preoxygenation"
+        },
+        "norepi_infusion": {
+            "type": "outcome",
+            "result": "partial",
+            "feedback": "While norepinephrine is appropriate, starting an infusion takes time. Push-dose vasopressors provide immediate BP support during the critical peri-intubation period, then transition to infusion.",
+            "reference": "Section 4.3: RAPID Approach",
+            "points": 5,
+            "next": "hfnc_preoxygenation"
+        },
+        "phenylephrine": {
+            "type": "scenario",
+            "title": "Induction Agent Selection",
+            "content": "Push-dose phenylephrine (100 mcg) administered.\nBP improving to 95/55 mmHg within 60 seconds.\n\nPatient now:\n• Pre-oxygenated with HFNC (SpO₂ 91%)\n• Hemodynamically optimized (BP 95/55)\n• Positioned with HOB elevated\n\nWhich induction agent would you choose for this high-risk intubation?",
+            "result": "correct",
+            "feedback": "Excellent choice! Push-dose phenylephrine provides rapid hemodynamic support without fluid overload. This is ideal for cirrhotic patients with distributive shock from low SVR.",
+            "reference": "Section 4.3: RAPID Approach",
+            "points": 10,
+            "vitals_update": {
+                "bp": {
+                    "value": "95/55 mmHg",
+                    "critical": false
+                }
+            },
+            "decisions": [
+                {
+                    "id": "propofol",
+                    "text": "Propofol 2 mg/kg",
+                    "next": "propofol_choice"
+                },
+                {
+                    "id": "etomidate",
+                    "text": "Etomidate 0.3 mg/kg",
+                    "next": "etomidate_choice"
+                },
+                {
+                    "id": "ketamine",
+                    "text": "Ketamine 1-2 mg/kg",
+                    "next": "ketamine_choice"
+                }
+            ]
+        },
+        "propofol_choice": {
+            "type": "outcome",
+            "result": "incorrect",
+            "feedback": "Propofol causes significant vasodilation and myocardial depression. Even with optimization, this would likely cause severe hypotension in a hemodynamically unstable patient. Avoid in shock states.",
+            "reference": "Section 5.1: Induction Agents",
+            "points": 0,
+            "next": "phenylephrine"
+        },
+        "etomidate_choice": {
+            "type": "outcome",
+            "result": "partial",
+            "feedback": "Etomidate is hemodynamically neutral but causes adrenal suppression. In septic patients, this may worsen outcomes. While reasonable, ketamine would be the optimal choice for shock states.",
+            "reference": "Section 5.1: Induction Agents",
+            "points": 5,
+            "next": "final_success"
+        },
+        "ketamine_choice": {
+            "type": "outcome",
+            "result": "correct",
+            "feedback": "Perfect choice! Ketamine provides hemodynamic stability through sympathomimetic effects, maintains airway reflexes, and provides analgesia. This is the ideal induction agent for hemodynamically unstable patients.",
+            "reference": "Section 5.1: Induction Agents",
+            "points": 10,
+            "next": "final_success"
+        },
+        "final_success": {
+            "type": "scenario",
+            "title": "Intubation Successful",
+            "content": "Intubation completed successfully with:\n• First-pass success using video laryngoscopy\n• No hypotension or desaturation\n• HFNC maintained during intubation for apneic oxygenation\n• Lung-protective ventilation initiated (TV 6 mL/kg IBW, PEEP 8)\n\nPost-intubation management:\n• Norepinephrine infusion started at 0.1 mcg/kg/min\n• Sedation with fentanyl/propofol\n• NG decompression for ascites\n\nVitals stabilizing:\n• BP: 105/60 mmHg\n• SpO₂: 96% on FiO₂ 60%\n• pH improving to 7.28",
+            "vitals_update": {
+                "bp": {
+                    "value": "105/60 mmHg",
+                    "critical": false
+                },
+                "spo2": {
+                    "value": "96%",
+                    "critical": false
+                },
+                "ph": {
+                    "value": "7.28",
+                    "critical": false
+                }
+            },
+            "decisions": [
+                {
+                    "id": "complete",
+                    "text": "Complete Case Review",
+                    "next": "completion"
+                }
+            ]
+        },
+        "completion": {
+            "type": "completion",
+            "title": "Case Completed Successfully!",
+            "summary": "Outstanding management of a high-risk airway!\n\nKey Learning Points:\n1. **Risk Stratification**: Always identify and modify risk factors before intubation\n2. **Pre-oxygenation**: HFNC superior to face mask in high-risk patients\n3. **Hemodynamic Optimization**: Push-dose pressors for immediate effect in distributive shock\n4. **Induction Agent Selection**: Ketamine ideal for hemodynamically unstable patients\n5. **Post-intubation Care**: Lung-protective ventilation and continued hemodynamic support\n\nClinical Pearls:\n• Shock index >0.9 predicts peri-intubation arrest\n• Liver failure = distributive shock (low SVR), not hypovolemia\n• Maintain HFNC during intubation for apneic oxygenation\n• Video laryngoscopy improves first-pass success\n\nFurther Reading:\n• Jaber S, et al. Clinical practice guidelines for intubation in ICU. Intensive Care Med. 2023\n• Mosier JM, et al. The Physiologically Difficult Airway. West J Emerg Med. 2015"
+        }
+    },
+    "references": {
+        "Section 2.1: NIV Contraindications": {
+            "title": "Contraindications to Noninvasive Ventilation",
+            "content": "<h3>Absolute Contraindications</h3><ul><li><strong>Inability to protect airway:</strong> GCS <8, absent gag reflex</li><li><strong>Cardiac or respiratory arrest</strong></li><li><strong>Severe hemodynamic instability</strong></li><li><strong>Facial trauma or deformity preventing mask seal</strong></li><li><strong>Active upper GI bleeding or vomiting</strong></li></ul><h3>Relative Contraindications</h3><ul><li>Agitation or uncooperative patient</li><li>Copious secretions</li><li>Recent upper GI or airway surgery</li><li>Severe abdominal distension</li></ul><p style=\"background: rgba(255, 68, 68, 0.2); padding: 10px; border-radius: 5px;\"><strong>Remember:</strong> NIV failure requiring emergent intubation has higher mortality than planned intubation. Choose wisely!</p>"
+        },
+        "Section 3.3: Risk Factors": {
+            "title": "Risk Factors for Peri-intubation Cardiac Arrest",
+            "content": "<h3>Major Risk Factors</h3><p>The following factors significantly increase the risk of adverse events during emergency intubation:</p><ul><li><strong>Hypotension:</strong> SBP <90 mmHg (10-fold increased risk)</li><li><strong>Hypoxemia:</strong> SpO₂ <90% despite optimization</li><li><strong>Severe Acidosis:</strong> pH <7.2</li><li><strong>Shock Index >0.9:</strong> HR/SBP ratio indicating hemodynamic instability</li><li><strong>Age >65:</strong> Reduced physiologic reserve</li></ul><h3>Risk Modification Strategies</h3><p style=\"background: rgba(76, 175, 80, 0.2); padding: 10px; border-radius: 5px;\">This patient has multiple high-risk features requiring optimization before intubation:</p><ul><li>Pre-oxygenation with HFNC to improve oxygen reserve</li><li>Hemodynamic support with vasopressors</li><li>Careful medication selection to avoid cardiovascular collapse</li><li>Preparation for post-intubation hypotension</li></ul><h3>The 4 Hs of Emergency Airway Management</h3><ol><li><strong>Hypoxemia:</strong> Optimize pre-oxygenation</li><li><strong>Hypotension:</strong> Restore hemodynamics</li><li><strong>Hyperkalemia:</strong> Check K+ if renal failure</li><li><strong>Hydrogen ions:</strong> Consider bicarbonate if pH <7.1</li></ol>"
+        },
+        "Section 4.2: Hypoxemia Management": {
+            "title": "Pre-oxygenation in High-Risk Patients",
+            "content": "<h3>Challenges in Liver Failure</h3><p>Liver failure patients have unique oxygenation challenges:</p><ul><li><strong>Hepatopulmonary Syndrome:</strong> Intrapulmonary shunting limits oxygenation</li><li><strong>Ascites:</strong> Diaphragmatic elevation reduces FRC by up to 40%</li><li><strong>Pulmonary Edema:</strong> V/Q mismatch from volume overload</li><li><strong>Pleural Effusions:</strong> Common in decompensated cirrhosis</li></ul><h3>HFNC vs Standard Oxygen Delivery</h3><table style=\"width: 100%; margin: 20px 0; border-collapse: collapse;\"><tr style=\"background: rgba(33, 150, 243, 0.2);\"><th style=\"padding: 10px; border: 1px solid #2196F3;\">Method</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">FiO₂</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Benefits</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Limitations</th></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\">Face Mask</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">60-80%</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Simple, available</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Poor seal, no PEEP, limited flow</td></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\">NRB Mask</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">85-90%</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Higher FiO₂</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">No PEEP, claustrophobic</td></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\">HFNC</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Up to 100%</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">PEEP effect, apneic oxygenation, comfort</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Equipment needed</td></tr></table><h3>Optimizing Pre-oxygenation</h3><p style=\"background: rgba(76, 175, 80, 0.2); padding: 10px; border-radius: 5px;\"><strong>Best Practice Protocol:</strong></p><ol><li>HFNC at 60 L/min, FiO₂ 100%</li><li>Head of bed elevated 20-30°</li><li>Pre-oxygenate for minimum 3 minutes</li><li>Keep HFNC on during intubation</li><li>Avoid bag-mask ventilation if possible</li></ol>"
+        },
+        "Section 4.3: RAPID Approach": {
+            "title": "Cardiovascular Optimization: RAPID Framework",
+            "content": "<h3>RAPID Assessment for Hemodynamic Management</h3><ul><li><strong>R</strong>esponsiveness to fluids - Assess with passive leg raise or IVC ultrasound</li><li><strong>A</strong>fterload assessment - Low SVR in cirrhosis/sepsis</li><li><strong>P</strong>reexisting conditions - Portal hypertension, varices</li><li><strong>I</strong>notropic state - Often hyperdynamic in cirrhosis</li><li><strong>D</strong>ynamic monitoring - Art line if time permits</li></ul><h3>Hemodynamic Patterns in Liver Failure</h3><p style=\"background: rgba(76, 175, 80, 0.2); padding: 10px; border-radius: 5px;\"><strong>Key Concept:</strong> Cirrhotic patients typically have distributive shock physiology:</p><ul><li>↓ Systemic vascular resistance (SVR)</li><li>↑ Cardiac output (hyperdynamic)</li><li>↓ Effective arterial blood volume</li><li>Portal hypertension with splanchnic vasodilation</li></ul><h3>Vasopressor Selection</h3><table style=\"width: 100%; margin: 20px 0; border-collapse: collapse;\"><tr style=\"background: rgba(33, 150, 243, 0.2);\"><th style=\"padding: 10px; border: 1px solid #2196F3;\">Agent</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Mechanism</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Dose</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Duration</th></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\"><strong>Push-dose Phenylephrine</strong></td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Pure α-agonist</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">50-200 mcg IV</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">5-10 min</td></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\"><strong>Push-dose Epinephrine</strong></td><td style=\"padding: 10px; border: 1px solid #2196F3;\">α and β agonist</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">5-20 mcg IV</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">5-10 min</td></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\"><strong>Norepinephrine infusion</strong></td><td style=\"padding: 10px; border: 1px solid #2196F3;\">α > β effects</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">0.05-0.5 mcg/kg/min</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Continuous</td></tr></table><p><strong>Push-dose Preparation:</strong><br>Phenylephrine: 1 mL of 10 mg/mL in 100 mL NS = 100 mcg/mL<br>Give 0.5-2 mL (50-200 mcg) every 2-5 minutes</p>"
+        },
+        "Section 5.1: Induction Agents": {
+            "title": "Induction Agent Selection in Shock",
+            "content": "<h3>Hemodynamic Effects of Common Induction Agents</h3><table style=\"width: 100%; margin: 20px 0; border-collapse: collapse;\"><tr style=\"background: rgba(33, 150, 243, 0.2);\"><th style=\"padding: 10px; border: 1px solid #2196F3;\">Agent</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Dose</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">BP Effect</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Best For</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Avoid In</th></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\"><strong>Propofol</strong></td><td style=\"padding: 10px; border: 1px solid #2196F3;\">1-2 mg/kg</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">↓↓ BP, ↓↓ SVR</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Hemodynamically stable</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Shock, elderly, cardiac dysfunction</td></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\"><strong>Etomidate</strong></td><td style=\"padding: 10px; border: 1px solid #2196F3;\">0.3 mg/kg</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Neutral</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Cardiovascular disease</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Sepsis (controversial), adrenal insufficiency</td></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\"><strong>Ketamine</strong></td><td style=\"padding: 10px; border: 1px solid #2196F3;\">1-2 mg/kg</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">↑ BP, ↑ HR</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Shock, bronchospasm</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Severe CAD, uncontrolled HTN, ↑ ICP</td></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\"><strong>Midazolam</strong></td><td style=\"padding: 10px; border: 1px solid #2196F3;\">0.1-0.3 mg/kg</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">↓ BP</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Status epilepticus</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">Shock, hepatic dysfunction</td></tr></table><h3>Ketamine: The Ideal Agent for Shock</h3><p style=\"background: rgba(76, 175, 80, 0.2); padding: 10px; border-radius: 5px;\"><strong>Advantages in hemodynamically unstable patients:</strong></p><ul><li><strong>Sympathomimetic effects:</strong> Increases endogenous catecholamine release</li><li><strong>Preserved reflexes:</strong> Maintains airway protective reflexes</li><li><strong>Bronchodilation:</strong> Beneficial in asthma/COPD</li><li><strong>Analgesia:</strong> Reduces sympathetic response to intubation</li><li><strong>Minimal respiratory depression:</strong> Maintains respiratory drive</li></ul><h3>Dosing Adjustments in Shock</h3><ul><li><strong>Ketamine:</strong> Reduce to 0.5-1 mg/kg in severe shock</li><li><strong>Etomidate:</strong> Standard dose usually tolerated</li><li><strong>Propofol:</strong> If must use, reduce to 0.5 mg/kg with vasopressor ready</li></ul><p><strong>Pro Tip:</strong> Whatever agent you choose, have push-dose vasopressors drawn up and ready at bedside!</p>"
+        }
+    }
+}

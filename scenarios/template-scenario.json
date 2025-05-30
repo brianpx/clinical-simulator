@@ -1,0 +1,144 @@
+{
+  "metadata": {
+    "title": "Scenario Title - Brief Description",
+    "description": "Detailed description of the clinical scenario and learning objectives",
+    "specialty": "Emergency Medicine/Critical Care/etc",
+    "difficulty": "basic|intermediate|advanced",
+    "duration": "10-15 min",
+    "author": "Your Name",
+    "version": "1.0",
+    "learning_objectives": [
+      "Objective 1",
+      "Objective 2",
+      "Objective 3"
+    ]
+  },
+  "initial_state": {
+    "patient": {
+      "demographics": "Age and gender (e.g., 45-year-old male)",
+      "weight": "XX kg",
+      "height": "XXX cm",
+      "diagnosis": "Primary presenting diagnosis",
+      "pmh": "Past medical history (optional)",
+      "allergies": "Known allergies (optional)",
+      "medications": "Current medications (optional)"
+    },
+    "vitals": {
+      "bp": {
+        "value": "120/80 mmHg",
+        "critical": false
+      },
+      "hr": {
+        "value": "80 bpm",
+        "critical": false
+      },
+      "spo2": {
+        "value": "98%",
+        "critical": false
+      },
+      "temp": {
+        "value": "37.0°C",
+        "critical": false
+      },
+      "rr": {
+        "value": "16",
+        "critical": false
+      },
+      "ph": {
+        "value": "7.40",
+        "critical": false
+      },
+      "inr": {
+        "value": "1.0",
+        "critical": false
+      }
+    },
+    "labs": {
+      "wbc": "10.5",
+      "hgb": "14.0",
+      "plt": "250",
+      "na": "140",
+      "k": "4.0",
+      "cr": "1.0",
+      "glucose": "100"
+    }
+  },
+  "nodes": {
+    "start": {
+      "type": "scenario",
+      "title": "Initial Assessment",
+      "content": "Clinical presentation description.\n\nKey findings:\n• Finding 1\n• Finding 2\n• Finding 3\n\nWhat is your initial approach?",
+      "decisions": [
+        {
+          "id": "option1",
+          "text": "First option description",
+          "next": "node1"
+        },
+        {
+          "id": "option2",
+          "text": "Second option description",
+          "next": "node2"
+        },
+        {
+          "id": "option3",
+          "text": "Third option description",
+          "next": "node3"
+        }
+      ]
+    },
+    "node1": {
+      "type": "outcome",
+      "result": "correct|incorrect|partial",
+      "feedback": "Explanation of why this choice is correct/incorrect and what happens",
+      "reference": "Reference Section Name",
+      "points": 10,
+      "next": "next_scenario_node"
+    },
+    "node2": {
+      "type": "scenario",
+      "title": "Next Decision Point",
+      "content": "Scenario continues with new information...",
+      "result": "correct",
+      "feedback": "Good choice! This is the recommended approach because...",
+      "reference": "Reference Section Name",
+      "points": 10,
+      "vitals_update": {
+        "bp": {
+          "value": "110/70 mmHg",
+          "critical": false
+        },
+        "hr": {
+          "value": "90 bpm",
+          "critical": false
+        }
+      },
+      "decisions": [
+        {
+          "id": "option2a",
+          "text": "Option A",
+          "next": "node2a"
+        },
+        {
+          "id": "option2b",
+          "text": "Option B",
+          "next": "node2b"
+        }
+      ]
+    },
+    "completion": {
+      "type": "completion",
+      "title": "Scenario Complete!",
+      "summary": "Congratulations on completing the scenario!\n\nKey Learning Points:\n1. Learning point 1\n2. Learning point 2\n3. Learning point 3\n\nClinical Pearls:\n• Pearl 1\n• Pearl 2\n\nFurther Reading:\n• Resource 1\n• Resource 2"
+    }
+  },
+  "references": {
+    "Reference Section Name": {
+      "title": "Detailed Reference Title",
+      "content": "<h3>Section Heading</h3><p>Educational content with evidence-based information.</p><ul><li><strong>Key Point:</strong> Explanation</li><li><strong>Key Point:</strong> Explanation</li></ul><h3>Clinical Guidelines</h3><p>Relevant guidelines and recommendations.</p>"
+    },
+    "Another Reference": {
+      "title": "Another Reference Title",
+      "content": "<h3>Tables Example</h3><table style=\"width: 100%; margin: 20px 0; border-collapse: collapse;\"><tr style=\"background: rgba(33, 150, 243, 0.2);\"><th style=\"padding: 10px; border: 1px solid #2196F3;\">Parameter</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Normal Range</th><th style=\"padding: 10px; border: 1px solid #2196F3;\">Critical Value</th></tr><tr><td style=\"padding: 10px; border: 1px solid #2196F3;\">pH</td><td style=\"padding: 10px; border: 1px solid #2196F3;\">7.35-7.45</td><td style=\"padding: 10px; border: 1px solid #2196F3;\"><7.2 or >7.6</td></tr></table>"
+    }
+  }
+}

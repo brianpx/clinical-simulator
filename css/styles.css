@@ -1,0 +1,220 @@
+/* Header fix to prevent overlap */
+.header {
+    background: linear-gradient(135deg, rgba(220, 20, 60, 0.9), rgba(139, 0, 0, 0.9));
+    padding: 15px 20px;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    min-height: 70px;
+}
+
+/* Title section - fixed width */
+.title {
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.title-icon {
+    font-size: 22px;
+}
+
+/* Vital signs monitor - flexible width */
+.vitals-monitor, #vitalsMonitor {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
+    border-radius: 10px;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.vital-display {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap; /* Prevent wrapping within vital */
+}
+
+.vital-display:last-child {
+    border-right: none;
+}
+
+.vital-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    font-weight: 600;
+}
+
+.vital-value {
+    font-size: 15px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+/* Score tracking - fixed width */
+.score-panel {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.score-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.score-icon {
+    font-size: 16px;
+}
+
+.score-label-text {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.score-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+/* Return to Menu Panel - fixed width */
+.return-to-menu-panel {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.return-to-menu-panel .menu-button {
+    background: transparent;
+    border: 2px solid rgba(76, 175, 80, 0.5);
+    color: #4CAF50;
+    padding: 6px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.return-to-menu-panel .menu-button:hover {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: #4CAF50;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+    .header {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 15px;
+    }
+
+    .title {
+        flex: 1 1 100%;
+        justify-content: center;
+        text-align: center;
+        min-width: auto;
+    }
+
+    .vitals-monitor {
+        flex: 1 1 100%;
+        order: 2;
+        min-width: auto;
+    }
+
+    .score-panel {
+        order: 3;
+    }
+
+    .return-to-menu-panel {
+        order: 4;
+    }
+}
+
+@media (max-width: 900px) {
+    .score-label-text {
+        display: none;
+    }
+
+    .vital-display {
+        padding: 0 8px;
+    }
+
+    .vital-label {
+        font-size: 10px;
+    }
+
+    .vital-value {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    .header {
+        padding: 10px;
+    }
+
+    .title {
+        font-size: 16px;
+    }
+
+    .title-icon {
+        font-size: 18px;
+    }
+
+    .vitals-monitor {
+        padding: 6px 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .vital-display {
+        flex: 0 0 45%;
+        justify-content: center;
+        border-right: none;
+        padding: 4px;
+    }
+
+    .score-panel {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .return-to-menu-panel {
+        width: 100%;
+    }
+
+    .return-to-menu-panel .menu-button {
+        width: 100%;
+        text-align: center;
+    }
+}

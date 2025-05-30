@@ -1,0 +1,191 @@
+{
+  "display": {
+    "theme": {
+      "mode": "dark",
+      "primaryColor": "#4CAF50",
+      "dangerColor": "#ff4444",
+      "warningColor": "#ffaa00",
+      "successColor": "#4CAF50",
+      "customCSS": null
+    },
+    "vitalsMonitor": {
+      "show": true,
+      "position": "right",
+      "updateAnimation": true,
+      "alarmSounds": false,
+      "criticalFlash": true,
+      "refreshRate": 1000
+    },
+    "pathTracker": {
+      "show": true,
+      "position": "left",
+      "showTimestamps": false,
+      "showPoints": true,
+      "autoScroll": true,
+      "maxItems": 20,
+      "clickableForReview": true
+    },
+    "scoreDisplay": {
+      "show": true,
+      "showPercentage": true,
+      "showStreak": false,
+      "position": "top-right"
+    },
+    "references": {
+      "openInModal": true,
+      "allowPrint": true,
+      "fontSize": "medium",
+      "highlighting": true
+    },
+    "animations": {
+      "enabled": true,
+      "speed": "normal",
+      "buttonHover": true,
+      "pageTransitions": true,
+      "feedbackDelay": 500
+    }
+  },
+  "behavior": {
+    "decisions": {
+      "randomizeOrder": true,
+      "showNumberLabels": true,
+      "keyboardShortcuts": true,
+      "confirmBeforeSelect": false,
+      "disableAfterSelection": false
+    },
+    "feedback": {
+      "showImmediately": true,
+      "requireAcknowledgment": true,
+      "showPoints": true,
+      "showReferences": true,
+      "audioFeedback": false,
+      "hapticFeedback": false
+    },
+    "timer": {
+      "enabled": false,
+      "duration": 900,
+      "showWarning": true,
+      "warningTime": 120,
+      "pauseOnFeedback": true,
+      "penaltyForTimeout": false
+    },
+    "hints": {
+      "enabled": false,
+      "maxHints": 3,
+      "pointPenalty": 5,
+      "showAfterIncorrect": true,
+      "progressiveHints": true
+    },
+    "difficulty": {
+      "adaptive": false,
+      "startLevel": "normal",
+      "adjustBasedOnPerformance": true,
+      "showDifficultyIndicator": true
+    }
+  },
+  "scoring": {
+    "system": "points",
+    "maxPointsPerDecision": 10,
+    "partialCredit": true,
+    "bonusForSpeed": false,
+    "bonusForNoMistakes": true,
+    "penaltyForIncorrect": 0,
+    "penaltyForReview": 0,
+    "trackHighScore": true,
+    "competencyMapping": false
+  },
+  "persistence": {
+    "saveProgress": true,
+    "autoSave": true,
+    "saveInterval": 30,
+    "resumeFromLastPoint": true,
+    "trackCompletedScenarios": true,
+    "resetProgressButton": true,
+    "exportResults": true
+  },
+  "accessibility": {
+    "highContrast": false,
+    "largeText": false,
+    "screenReaderMode": false,
+    "reduceMotion": false,
+    "colorBlindMode": "none",
+    "keyboardOnly": false,
+    "focusIndicators": true
+  },
+  "advanced": {
+    "debugMode": false,
+    "showNodeIds": false,
+    "logDecisions": true,
+    "allowSkip": false,
+    "expertMode": false,
+    "showAllPaths": false,
+    "analytics": true,
+    "telemetry": false
+  },
+  "educational": {
+    "mode": "learning",
+    "showLearningObjectives": true,
+    "prerequisiteCheck": false,
+    "postTestMode": false,
+    "certificateGeneration": false,
+    "competencyTracking": true,
+    "reflectionPrompts": false,
+    "peerComparison": false
+  },
+  "multiplayer": {
+    "enabled": false,
+    "mode": "collaborative",
+    "maxPlayers": 4,
+    "turnBased": false,
+    "sharedDecisions": true,
+    "competitiveScoring": false
+  },
+  "content": {
+    "allowCustomScenarios": true,
+    "scenarioCategories": [
+      "critical-care",
+      "emergency",
+      "pediatric",
+      "surgical"
+    ],
+    "filterByDifficulty": true,
+    "filterByDuration": true,
+    "favoriteScenarios": [],
+    "recentlyPlayed": true,
+    "recommendations": true
+  },
+  "integrations": {
+    "lms": {
+      "enabled": false,
+      "platform": null,
+      "autoReportCompletion": true,
+      "gradePassback": true
+    },
+    "authentication": {
+      "required": false,
+      "method": "none",
+      "trackUserProgress": true
+    },
+    "api": {
+      "enabled": false,
+      "endpoint": null,
+      "webhooks": false
+    }
+  },
+  "mobile": {
+    "responsiveDesign": true,
+    "touchOptimized": true,
+    "swipeGestures": false,
+    "pinchToZoom": true,
+    "orientationLock": false,
+    "offlineMode": true
+  },
+  "experimental": {
+    "aiAssistant": false,
+    "voiceCommands": false,
+    "vrMode": false,
+    "adaptiveContent": false,
+    "emotionTracking": false,
+    "eyeTracking": false
+  }
+}

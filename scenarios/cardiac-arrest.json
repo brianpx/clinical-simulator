@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "title": "Cardiac Arrest Protocol",
+    "description": "Lead a code blue team through ACLS",
+    "specialty": "Emergency Medicine",
+    "difficulty": "intermediate",
+    "duration": "10-15 min"
+  },
+  "initial_state": {
+    "patient": {
+      "demographics": "68-year-old male",
+      "weight": "85 kg",
+      "diagnosis": "Witnessed cardiac arrest"
+    },
+    "vitals": {
+      "bp": {"value": "0/0", "critical": true},
+      "hr": {"value": "0", "critical": true},
+      "spo2": {"value": "0%", "critical": true}
+    }
+  },
+  "nodes": {
+    "start": {
+      "type": "scenario",
+      "title": "Code Blue Called",
+      "content": "Patient found unresponsive in hospital bed...",
+      "decisions": [
+        {"id": "cpr", "text": "Start CPR immediately", "next": "start_cpr"},
+        {"id": "pulse", "text": "Check for pulse first", "next": "check_pulse"}
+      ]
+    }
+    // ... more nodes
+  }
+}
